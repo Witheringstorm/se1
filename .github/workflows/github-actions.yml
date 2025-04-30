@@ -1,6 +1,9 @@
  name: Java CI with Maven
  on:
- [ push, pull_request, workflow_dispatch ]
+ push:
+ branches: [ $default-branch ]
+ pull_request:
+ branches: [ $default-branch ]
  jobs:
  build:
  runs-on: ubuntu-latest

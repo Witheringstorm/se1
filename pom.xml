@@ -84,6 +84,45 @@
 
   <build>
     <plugins>
+    <plugin>
+    <groupId>org.jacoco</groupId>
+    <artifactId>jacoco-maven-plugin</artifactId>
+    <version>0.8.9</version>
+    <executions>
+        <!-- 准备 JaCoCo 代理，用于测试阶段 -->
+        <execution>
+            <goals>
+                <goal>prepare-agent</goal>
+            </goals>
+        </execution>
+        <!-- 附加到 Maven 测试阶段，生成报告 -->
+        <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+                <goal>report</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+
+    <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>3.17.0</version> 
+          <configuration>
+              <rulesets>
+                  <ruleset>customize-rules.xml</ruleset>
+              </rulesets>
+          </configuration>
+          <executions>
+              <execution>
+                  <goals>
+                      <goal>check</goal>
+                  </goals>
+              </execution>
+          </executions>
+      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -130,6 +169,7 @@
         </dependency>
         </dependencies>
       </plugin>
+
   
        <plugin> 
         <groupId>org.apache.maven.plugins</groupId> 
@@ -149,39 +189,7 @@
         </executions> 
       </plugin>
 
-      <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.17.0</version> 
-                <configuration>
-                
-                    <rulesets>
-                        <ruleset>customize-rules.xml</ruleset>
-                    </rulesets>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-
-
-                   <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-pmd-plugin</artifactId>
-            <version>3.18.0</version>
-            <executions>
-                <execution>
-                    <goals>
-                        <goal>check</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
+      
     </plugins>
 
 
@@ -193,6 +201,33 @@
 
   <reporting> 
     <plugins> 
+    <!-- JaCoCo 报告插件 -->
+        <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.9</version>
+            <reportSets>
+                <reportSet>
+                    <id>aggregate</id>
+                    <inherited>false</inherited>
+                    <reports>
+                        <report>report-aggregate</report>
+                    </reports>
+                </reportSet>
+            </reportSets>
+        </plugin>
+        <!-- PMD 报告插件 -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <version>3.17.0</version>
+            <configuration>
+                <rulesets>
+                    <ruleset>customize-rules.xml</ruleset>
+                </rulesets>
+            </configuration>
+        </plugin>
+
       <plugin> 
         <groupId>org.apache.maven.plugins</groupId> 
         <artifactId>maven-javadoc-plugin</artifactId> 

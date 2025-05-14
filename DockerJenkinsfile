@@ -39,12 +39,14 @@ pipeline {
         stage('Upload image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh """
-                    echo "Logging in to Docker Hub..."
-                    docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
-                    docker push "${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
-                    docker push "${env.DOCKER_IMAGE}:latest"
-                    """
+                    script {
+                        // 使用更安全的方法登录Docker Hub
+                        sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
+                        docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_USERNAME}:${env.DOCKER_PASSWORD}") {
+                            docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
+                            docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
+                        }
+                    }
                 }
             }
         }

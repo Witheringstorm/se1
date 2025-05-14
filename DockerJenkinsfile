@@ -3,7 +3,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'woshitanzheng/teedy-app' // 你的 Docker Hub 用户名和仓库名称
         DOCKER_CREDENTIALS_ID = '12345' // Jenkins中配置的凭证ID
-        DOCKER_USERNAME = 'woshitanzheng'
+        DOCKER_USERNAME = '1976732771@qq.com'
         DOCKER_PASSWORD = '20040918tz'
         DOCKER_TAG = "${env.BUILD_NUMBER}" // 使用构建号作为标签
     }

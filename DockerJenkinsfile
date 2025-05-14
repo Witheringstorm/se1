@@ -38,7 +38,7 @@ pipeline {
             steps {
                 script {
                     // 使用docker login命令登录阿里云容器镜像服务
-                    sh "docker login --username=aliyun5747505221 crpi-gt1cywmx9wbg739a.cn-hangzhou.personal.cr.aliyuncs.com"
+                    sh "docker login --username aliyun5747505221  --password-stdin 20040918tz"
 
                     // 推送镜像
                     sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"

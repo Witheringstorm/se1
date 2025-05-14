@@ -36,17 +36,15 @@ pipeline {
             }
         }
        // Uploading Docker images into Docker Hub 
-        stage('Upload image') { 
-            steps { 
-                script { 
-                    // sign in Docker Hub 
-                                        docker.withRegistry('https://registry.hub.docker.com', 
-                    'DOCKER_HUB_CREDENTIALS') { 
-                    // push image 
-                    docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push() 
-                    // ：optional: label latest 
-                    docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest') 
-                    } 
+        stage('Upload image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub_credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh """
+                    echo "Logging in to Docker Hub..."
+                    docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
+                    docker push "${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                    docker push "${env.DOCKER_IMAGE}:latest"
+                    """
                 }
             }
         }

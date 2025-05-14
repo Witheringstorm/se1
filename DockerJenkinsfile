@@ -37,7 +37,6 @@ pipeline {
         }
         stage('Upload image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: "${env.DOCKER_USERNAME}", passwordVariable: "${env.DOCKER_PASSWORD}")]) {
                     script {
                         docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_USERNAME}:${env.DOCKER_PASSWORD}") {
                             docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
@@ -46,7 +45,6 @@ pipeline {
                     }
                 }
             }
-        }
         stage('Run containers') {
             steps {
                 script {

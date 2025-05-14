@@ -1,10 +1,10 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE = 'woshitanzheng/teedy-app'
-        DOCKER_USERNAME = '1976732771@qq.com'
-        DOCKER_PASSWORD = '20040918tz'
-        DOCKER_TAG = "${env.BUILD_NUMBER}"
+        DOCKER_IMAGE = 'crpi-gt1cywmx9wbg739a.cn-hangzhou.personal.cr.aliyuncs.com/teedy-app' // 替换为您的阿里云镜像地址
+        DOCKER_TAG = "${env.BUILD_NUMBER}" // 使用构建号作为标签
+        DOCKER_USERNAME = 'aliyun5747505221' // 您的阿里云容器镜像服务用户名
+        DOCKER_PASSWORD = '20040918tz' // 您的阿里云容器镜像服务密码
     }
     stages {
         stage('Build') {
@@ -34,18 +34,18 @@ pipeline {
                 }
             }
         }
-         stage('Upload image') { 
-            steps { 
-                script { 
-                    // sign in Docker Hub 
-                                        docker.withRegistry('https://registry.hub.docker.com', 
-                    'dockerhub_credentials') { 
-                    // push image 
-                    docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push() 
-                    // ：optional: label latest 
-                    docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest') 
-                    } 
-                }}}
+        stage('Upload image') {
+            steps {
+                script {
+                    // 使用docker login命令登录阿里云容器镜像服务
+                    sh "echo '${env.DOCKER_PASSWORD}' | docker login --username '${env.DOCKER_USERNAME}' --password-stdin"
+
+                    // 推送镜像
+                    sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                    sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} latest"
+                }
+            }
+        }
         stage('Run containers') {
             steps {
                 script {

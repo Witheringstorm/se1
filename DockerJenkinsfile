@@ -45,7 +45,7 @@ pipeline {
                     // ：optional: label latest 
                     docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest') 
                     } 
-                }
+                }}}
         stage('Run containers') {
             steps {
                 script {

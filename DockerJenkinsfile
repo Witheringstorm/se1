@@ -2,6 +2,8 @@ pipeline {
     agent any
     environment {
         DOCKER_IMAGE = 'woshitanzheng/teedy-app'
+        DOCKER_USERNAME = '1976732771@qq.com'
+        DOCKER_PASSWORD = '20040918tz'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
     }
     stages {
@@ -12,25 +14,32 @@ pipeline {
                     extensions: [],
                     userRemoteConfigs: [[url: 'https://github.com/TZ-WYmail/CS_304_MyTeedy.git']]
                 )
-                sh 'mvn -B -DskipTests clean package'
+                script {
+                    sh 'mvn -B -DskipTests clean package'
+                }
             }
         }
         stage('Building image') {
             steps {
-                sh 'ls -l Dockerfile'
-                docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
+                script {
+                    sh 'ls -l Dockerfile'
+                    docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
+                }
+            }
+        }
+        stage('Test Docker Hub Access') {
+            steps {
+                script {
+                    sh 'docker pull hello-world'
+                }
             }
         }
         stage('Upload image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub_credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    script {
-                        // 使用更安全的方法登录Docker Hub
-                        sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
-                        docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_USERNAME}:${env.DOCKER_PASSWORD}") {
-                            docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
-                            docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
-                        }
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_USERNAME}:${env.DOCKER_PASSWORD}") {
+                        docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
+                        docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
                     }
                 }
             }

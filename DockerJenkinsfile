@@ -1,11 +1,10 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE = 'woshitanzheng/teedy-app' // 你的 Docker Hub 用户名和仓库名称
-        DOCKER_HUB_CREDENTIALS =  credentials('dockerhub_credentials') // Jenkins中配置的凭证ID
-        DOCKER_HUB_USERNAME = '1976732771@qq.com'
-        DOCKER_HUB_PASSWORD = '20040918tz'
+        DOCKER_IMAGE = 'crpi-gt1cywmx9wbg739a.cn-hangzhou.personal.cr.aliyuncs.com/teedy-app' // 替换为您的阿里云镜像地址
         DOCKER_TAG = "${env.BUILD_NUMBER}" // 使用构建号作为标签
+        DOCKER_USERNAME = 'aliyun5747505221' // 您的阿里云容器镜像服务用户名
+        DOCKER_PASSWORD = '20040918tz' // 您的阿里云容器镜像服务密码
     }
     stages {
         stage('Build') {
@@ -35,22 +34,18 @@ pipeline {
                 }
             }
         }
-       stage('Upload image') {
-    steps {
-        script {
-            // 定义环境变量，包含Docker Hub的用户名和密码
-            def dockerUsername = '1976732771@qq.com'
-            def dockerPassword = '20040918tz'
+        stage('Upload image') {
+            steps {
+                script {
+                    // 使用docker login命令登录阿里云容器镜像服务
+                    sh "echo '${DOCKER_PASSWORD}' | docker login -u '${DOCKER_USERNAME}' --password-stdin"
 
-            // 使用docker login命令登录Docker Hub
-            sh "echo '${dockerPassword}' | docker login -u '${dockerUsername}' --password-stdin"
-
-            // 推送镜像
-            sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
-            sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}" latest
+                    // 推送镜像
+                    sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                    sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} latest"
+                }
+            }
         }
-    }
-}
         stage('Run containers') {
             steps {
                 script {

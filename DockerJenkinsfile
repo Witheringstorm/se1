@@ -35,18 +35,22 @@ pipeline {
                 }
             }
         }
-       // Uploading Docker images into Docker Hub 
-        stage('Upload image') {
-            steps {
-                    script {
-                        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_credentials') {
-                            docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
-                            docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
-                        }
-                    }
-                
-            }
+       stage('Upload image') {
+    steps {
+        script {
+            // 定义环境变量，包含Docker Hub的用户名和密码
+            def dockerUsername = '1976732771@qq.com'
+            def dockerPassword = '20040918tz'
+
+            // 使用docker login命令登录Docker Hub
+            sh "echo ${dockerPassword} | docker login -u ${dockerUsername} --password-stdin"
+
+            // 推送镜像
+            sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+            sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}" latest
         }
+    }
+}
         stage('Run containers') {
             steps {
                 script {

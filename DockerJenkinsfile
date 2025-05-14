@@ -3,8 +3,8 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'woshitanzheng/teedy-app' // 你的 Docker Hub 用户名和仓库名称
         DOCKER_CREDENTIALS_ID = '12345' // Jenkins中配置的凭证ID
-        DOCKER_HUB_USERNAME = 'woshitanzheng'
-        DOCKER_HUB_PASSWORD = '20040918tz'
+        DOCKER_USERNAME = 'woshitanzheng'
+        DOCKER_PASSWORD = '20040918tz'
         DOCKER_TAG = "${env.BUILD_NUMBER}" // 使用构建号作为标签
     }
     stages {
@@ -37,9 +37,9 @@ pipeline {
         }
         stage('Upload image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: "${env.DOCKER_HUB_USERNAME}", passwordVariable: "${env.DOCKER_HUB_PASSWORD}")]) {
+                withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: "${env.DOCKER_USERNAME}", passwordVariable: "${env.DOCKER_PASSWORD}")]) {
                     script {
-                        docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_HUB_USERNAME}:${env.DOCKER_HUB_PASSWORD}") {
+                        docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_USERNAME}:${env.DOCKER_PASSWORD}") {
                             docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
                             docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
                         }

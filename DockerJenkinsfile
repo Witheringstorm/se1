@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_IMAGE = 'woshitanzheng/teedy-app' // 你的 Docker Hub 用户名和仓库名称
-        DOCKER_credentialsId = '12345'
+        DOCKER_CREDENTIALS_ID = '12345' // Jenkins中配置的凭证ID
         DOCKER_TAG = "${env.BUILD_NUMBER}" // 使用构建号作为标签
     }
     stages {
@@ -18,40 +18,31 @@ pipeline {
         }
         stage('Building image') {
             steps {
-                script {
-                    sh 'ls -l Dockerfile'
-                    docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
-                }
+                sh 'ls -l Dockerfile'
+                docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
             }
-        stages {
-                stage('Test Docker Hub Access') {
-                    steps {
-                        script {
-                            sh 'docker pull hello-world'
-                        }
-                    }
-                }
+        }
+        stage('Test Docker Hub Access') {
+            steps {
+                sh 'docker pull hello-world'
             }
+        }
         stage('Upload image') {
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: '12345', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                        docker.withRegistry('https://registry.hub.docker.com', 'DOCKER_HUB_CREDENTIALS') {
-                            docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
-                            docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
-                        }
+                withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                    docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_HUB_USERNAME}:${env.DOCKER_HUB_PASSWORD}") {
+                        docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
+                        docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
                     }
                 }
             }
         }
         stage('Run containers') {
             steps {
-                script {
-                    sh 'docker stop teedy-container-8081 || true'
-                    sh 'docker rm teedy-container-8081 || true'
-                    docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").run(['--name', 'teedy-container-8081', '-d', '-p', '8081:8080'])
-                    sh 'docker ps --filter "name=teedy-container"'
-                }
+                sh 'docker stop teedy-container-8081 || true'
+                sh 'docker rm teedy-container-8081 || true'
+                docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").run(['--name', 'teedy-container-8081', '-d', '-p', '8081:8080'])
+                sh 'docker ps --filter "name=teedy-container"'
             }
         }
     }

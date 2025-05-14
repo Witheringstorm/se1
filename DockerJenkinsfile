@@ -43,7 +43,7 @@ pipeline {
             def dockerPassword = '20040918tz'
 
             // 使用docker login命令登录Docker Hub
-            sh "echo ${dockerPassword} | docker login -u ${dockerUsername} --password-stdin"
+            sh "echo '${dockerPassword}' | docker login -u '${dockerUsername}' --password-stdin"
 
             // 推送镜像
             sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"

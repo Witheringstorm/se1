@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_IMAGE = 'woshitanzheng/teedy-app' // 你的 Docker Hub 用户名和仓库名称
+        DOCKER_credentialsId = '12345'
         DOCKER_TAG = "${env.BUILD_NUMBER}" // 使用构建号作为标签
     }
     stages {
@@ -22,7 +23,15 @@ pipeline {
                     docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
                 }
             }
-        }
+        stages {
+                stage('Test Docker Hub Access') {
+                    steps {
+                        script {
+                            sh 'docker pull hello-world'
+                        }
+                    }
+                }
+            }
         stage('Upload image') {
             steps {
                 script {

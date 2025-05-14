@@ -1,10 +1,8 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE = 'crpi-gt1cywmx9wbg739a.cn-hangzhou.personal.cr.aliyuncs.com/teedy-app' // 替换为您的阿里云镜像地址
-        DOCKER_TAG = "${env.BUILD_NUMBER}" // 使用构建号作为标签
-        DOCKER_USERNAME = 'aliyun5747505221' // 您的阿里云容器镜像服务用户名
-        DOCKER_PASSWORD = '20040918tz' // 您的阿里云容器镜像服务密码
+        DOCKER_IMAGE = 'woshitanzheng/teedy-app'
+        DOCKER_TAG = "${env.BUILD_NUMBER}"
     }
     stages {
         stage('Build') {
@@ -14,35 +12,26 @@ pipeline {
                     extensions: [],
                     userRemoteConfigs: [[url: 'https://github.com/TZ-WYmail/CS_304_MyTeedy.git']]
                 )
-                script {
-                    sh 'mvn -B -DskipTests clean package'
-                }
+                sh 'mvn -B -DskipTests clean package'
             }
         }
         stage('Building image') {
             steps {
-                script {
-                    sh 'ls -l Dockerfile'
-                    docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
-                }
-            }
-        }
-        stage('Test Docker Hub Access') {
-            steps {
-                script {
-                    sh 'docker pull hello-world'
-                }
+                sh 'ls -l Dockerfile'
+                docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
             }
         }
         stage('Upload image') {
             steps {
-                script {
-                    // 使用docker login命令登录阿里云容器镜像服务
-                    sh "docker login --username aliyun5747505221  --password-stdin 20040918tz"
-
-                    // 推送镜像
-                    sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
-                    sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} latest"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub_credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    script {
+                        // 使用更安全的方法登录Docker Hub
+                        sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
+                        docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_USERNAME}:${env.DOCKER_PASSWORD}") {
+                            docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
+                            docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
+                        }
+                    }
                 }
             }
         }

@@ -364,6 +364,19 @@ angular.module('docs',
         }
       }
     })
+
+      //注册
+    .state('Registerpart', {
+      url: '/register',
+      views: {
+        'page': {
+          templateUrl: 'partial/docs/registration.html',
+          controller: 'My_register'
+        }
+      }
+    })
+
+
     .state('user', {
       url: '/user',
       abstract: true,

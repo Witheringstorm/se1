@@ -49,6 +49,12 @@ angular.module('docs').controller('Login', function(Restangular, $scope, $rootSc
     });
   };
 
+
+
+  $scope.openRegistration = function () {
+    $state.go('Registerpart')
+  };
+
   // Password lost
   $scope.openPasswordLost = function () {
     $uibModal.open({

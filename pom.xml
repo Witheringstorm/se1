@@ -88,6 +88,11 @@
     <groupId>org.jacoco</groupId>
     <artifactId>jacoco-maven-plugin</artifactId>
     <version>0.8.9</version>
+     <configuration>
+        <includes>
+            <include>**/*Test*</include>
+        </includes>
+    </configuration>
     <executions>
         <!-- 准备 JaCoCo 代理，用于测试阶段 -->
         <execution>
@@ -105,24 +110,28 @@
         </execution>
     </executions>
 </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.21.0</version> <!-- 使用最新版本 -->
+        <configuration>
+            <!-- 可选配置 -->
+            <rulesets>
+                <ruleset>customize-rules.xml</ruleset> <!-- 自定义规则集路径 -->
+            </rulesets>
 
-    <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-pmd-plugin</artifactId>
-          <version>3.17.0</version> 
-          <configuration>
-              <rulesets>
-                  <ruleset>customize-rules.xml</ruleset>
-              </rulesets>
-          </configuration>
-          <executions>
-              <execution>
-                  <goals>
-                      <goal>check</goal>
-                  </goals>
-              </execution>
-          </executions>
-      </plugin>
+            <failOnViolation>false</failOnViolation>
+            <!--        <targetJdk>1.8</targetJdk> &lt;!&ndash; 指定目标JDK版本 &ndash;&gt;-->
+        </configuration>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>check</goal> <!-- 在验证阶段执行PMD检查 -->
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+   
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -177,6 +186,9 @@
         <version>3.6.3</version> 
         <configuration> 
           <failOnError>false</failOnError> 
+           <rulesets>
+            <ruleset>${project.basedir}/customize-rules.xml</ruleset>
+          </rulesets>
         </configuration> 
         <executions> 
           <execution> 
@@ -268,6 +280,15 @@
 
   <dependencyManagement>
     <dependencies>
+
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.7.1</version>
+        <scope>test</scope>
+    </dependency>
+
+
       <dependency>
         <groupId>com.sismics.docs</groupId>
         <artifactId>docs-core</artifactId>

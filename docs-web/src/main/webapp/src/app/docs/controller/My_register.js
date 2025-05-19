@@ -1,18 +1,18 @@
 'use strict';
 
-
-angular.module("docs").controller("My_register", ["Rectangular", "$scope", "$rootScope", "$state", "$stateParams", "$dialog", "User", "$translate", "$uibModal", function (a, b, c, d, e, f, g, h, i) {
+angular.module("docs").controller("My_register", function(Restangular, $scope, $rootScope, $state, $stateParams, $dialog, User, $translate) {
     // 初始化注册数据模型
     $scope.registerData = {
         username: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        email: '', // 添加 email 字段
+        storageQuota: '' // 添加 storageQuota 字段
     };
 
     // 注册方法
     $scope.Register = function() {
         console.log('Register button clicked');
-        showMessageBox("in registering")
         // 验证表单是否有效
         if ($scope.registerForm.$invalid) {
             // 显示表单无效的提示
@@ -36,9 +36,11 @@ angular.module("docs").controller("My_register", ["Rectangular", "$scope", "$roo
         }
 
         // 发送注册请求到后端
-        Restangular.one('user').post('register', {
+        Restangular.one('user').customPUT({
             username: $scope.registerData.username,
-            password: $scope.registerData.password
+            password: $scope.registerData.password,
+            email: $scope.registerData.email,
+            storage_quota: $scope.registerData.storageQuota
         }).then(function() {
             // 注册成功
             showMessageBox(
@@ -63,4 +65,4 @@ angular.module("docs").controller("My_register", ["Rectangular", "$scope", "$roo
     function showMessageBox(title, message, buttons) {
         return $dialog.messageBox(title, message, buttons);
     }
-}]);
+});

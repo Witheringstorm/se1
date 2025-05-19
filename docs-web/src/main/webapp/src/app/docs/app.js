@@ -355,6 +355,7 @@ angular.module('docs',
         }
       }
     })
+
     .state('login', {
       url: '/login?redirectState&redirectParams',
       views: {
@@ -366,7 +367,7 @@ angular.module('docs',
     })
 
       //注册
-    .state('Registerpart', {
+    .state('my_register', {
       url: '/register',
       views: {
         'page': {
@@ -387,6 +388,7 @@ angular.module('docs',
         }
       }
     })
+
     .state('user.default', {
       url: '',
       views: {

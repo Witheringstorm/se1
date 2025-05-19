@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <div class="container">
-    <h1>{{ 'register.title' | translate }}</h1>
-    <form name="registerForm" novalidate ng-submit="register()">
+    <h1>Register</h1>
+    <form name="registerForm" novalidate ng-submit="Register()">
         <div class="form-group">
-            <label for="username">{{ 'register.username' | translate }}</label>
+            <label for="username">Username</label>
             <input type="text" class="form-control" id="username" name="username" ng-model="registerData.username" required>
         </div>
         <div class="form-group">
-            <label for="password">{{ 'register.password' | translate }}</label>
+            <label for="password">Password</label>
             <input type="password" class="form-control" id="password" name="password" ng-model="registerData.password" required>
         </div>
         <div class="form-group">
-            <label for="confirmPassword">{{ 'register.confirm_password' | translate }}</label>
+            <label for="confirmPassword">Confirm_password</label>
             <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" ng-model="registerData.confirmPassword" required>
         </div>
-        <button type="submit" class="btn btn-primary" ng-disabled="registerForm.$invalid">{{ 'register.submit' | translate }}</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>

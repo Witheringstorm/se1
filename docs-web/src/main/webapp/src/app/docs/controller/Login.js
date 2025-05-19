@@ -48,11 +48,8 @@ angular.module('docs').controller('Login', function(Restangular, $scope, $rootSc
       }
     });
   };
-
-
-
   $scope.openRegistration = function () {
-    $state.go('Registerpart')
+    $state.go('my_register')
   };
 
   // Password lost

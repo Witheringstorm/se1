@@ -1,11 +1,10 @@
 pipeline {
     agent any
     environment {
-        // 定义环境变量
-        // Jenkins 凭证配置
-        DOCKER_HUB_CREDENTIALS = credentials('123456') // Docker Hub 凭证 ID 存储在 Jenkins 中
-        DOCKER_IMAGE = 'woshitanzheng/CS_304_MyTeedy' // 你的 Docker Hub 用户名和仓库名称
+        DOCKER_IMAGE = 'crpi-gt1cywmx9wbg739a.cn-hangzhou.personal.cr.aliyuncs.com/teedy-app' // 替换为您的阿里云镜像地址
         DOCKER_TAG = "${env.BUILD_NUMBER}" // 使用构建号作为标签
+        DOCKER_USERNAME = 'aliyun5747505221' // 您的阿里云容器镜像服务用户名
+        DOCKER_PASSWORD = '20040918tz' // 您的阿里云容器镜像服务密码
     }
     stages {
         stage('Build') {
@@ -15,45 +14,47 @@ pipeline {
                     extensions: [],
                     userRemoteConfigs: [[url: 'https://github.com/TZ-WYmail/CS_304_MyTeedy.git']]
                 )
-                // 你的 GitHub 仓库
-                sh 'mvn -B -DskipTests clean package'
+                script {
+                    sh 'mvn -B -DskipTests clean package'
+                }
             }
         }
-        // 构建 Docker 镜像
         stage('Building image') {
             steps {
                 script {
-                    // 假设 Dockerfile 位于根目录
+                    sh 'ls -l Dockerfile'
                     docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
                 }
             }
         }
-        // 上传 Docker 镜像到 Docker Hub
-        stage('Upload image') {
+        stage('Test Docker Hub Access') {
             steps {
                 script {
-                    // 登录 Docker Hub
-                    docker.withRegistry('https://registry.hub.docker.com', 'DOCKER_HUB_CREDENTIALS') {
-                        // 推送镜像
-                        docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
-                        // 可选：标记为 latest
-                        docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
-                    }
+                    sh 'docker pull hello-world'
                 }
             }
         }
-        // 运行 Docker 容器
+        stage('Upload image') {
+            steps {
+                script {
+                    // 使用docker login命令登录阿里云容器镜像服务
+                    sh "echo '${env.DOCKER_PASSWORD}' | docker login --username '${env.DOCKER_USERNAME}' --password-stdin"
+
+                    // 为镜像打标签
+                    sh "docker tag ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} ${env.DOCKER_IMAGE}:latest"
+
+                    // 推送镜像
+                    sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                    sh "docker push ${env.DOCKER_IMAGE}:latest"
+                }
+            }
+        }
         stage('Run containers') {
             steps {
                 script {
-                    // 停止并删除已存在的容器
                     sh 'docker stop teedy-container-8081 || true'
                     sh 'docker rm teedy-container-8081 || true'
-                    // 运行容器
-                    docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").run(
-                        '--name teedy-container-8081 -d -p 8081:8080'
-                    )
-                    // 可选：列出所有 teedy 容器
+                    docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").run(['--name', 'teedy-container-8081', '-d', '-p', '8081:8080'])
                     sh 'docker ps --filter "name=teedy-container"'
                 }
             }

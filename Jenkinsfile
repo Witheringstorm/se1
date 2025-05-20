@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker') // This must match your Jenkins credential ID
+        DOCKER_HUB_CREDENTIALS = credentials('docker_hub') // This must match your Jenkins credential ID
         DOCKER_IMAGE = 'witherlloyd/teedy-app'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
     }

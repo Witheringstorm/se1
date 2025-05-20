@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker_hub') // This must match your Jenkins credential ID
         DOCKER_IMAGE = 'witherlloyd/teedy-app'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
     }
@@ -30,7 +29,7 @@ pipeline {
         stage('Upload to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker_hub') {
                         docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
                         docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
                     }

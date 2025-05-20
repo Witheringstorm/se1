@@ -14,7 +14,7 @@ DOCKER_IMAGE = 'witherlloyd/teedy-app' // your Docker Hub user name and Reposito
  stage('Build') {
  steps {
  checkout scmGit(
- branches: [[name: '*/master']],
+ branches: [[name: '*/docker']],
  extensions: [],
  userRemoteConfigs: [[url: 'https://github.com/Witheringstorm/se1.git']] // your GitHub Repository
  )
